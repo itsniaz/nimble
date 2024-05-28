@@ -79,7 +79,7 @@ fun HomeScreen() {
     }
 }
 
-enum class SelectedDrawer{
+enum class SelectedDrawer {
     MyNotes,
     Reminders,
     Personal,
@@ -90,6 +90,7 @@ enum class SelectedDrawer{
     Settings,
     HelpAndFeedback
 }
+
 @Composable
 private fun DrawerContent(drawerState: DrawerState) {
 
@@ -118,6 +119,7 @@ private fun DrawerContent(drawerState: DrawerState) {
                     drawerState.close()
                 }
             })
+
             NavigationDrawerItem(label = {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
@@ -135,16 +137,21 @@ private fun DrawerContent(drawerState: DrawerState) {
             })
             Spacer(modifier = Modifier.height(16.dp))
             HorizontalDivider()
-            Row(modifier = Modifier.padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text("Labels", fontSize = 12.sp)
                 Spacer(modifier = Modifier.weight(1f))
-                Box (modifier = Modifier
+                Box(modifier = Modifier
                     .clip((RoundedCornerShape(8.dp)))
                     .clickable {
-                    }){
-                    Text(text = "Edit",
+                    }) {
+                    Text(
+                        text = "Edit",
                         fontSize = 12.sp,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
                 }
             }
 
@@ -152,7 +159,10 @@ private fun DrawerContent(drawerState: DrawerState) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(painter = painterResource(id = R.drawable.ic_label_outlined_24), "Account Icon")
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_label_outlined_24),
+                        "Account Icon"
+                    )
                     Spacer(modifier = Modifier.width(16.dp))
                     Text(text = "Personal")
                 }
@@ -160,7 +170,8 @@ private fun DrawerContent(drawerState: DrawerState) {
                 scope.launch {
                     drawerState.close()
                 }
-                selectedDrawer = SelectedDrawer.Personal })
+                selectedDrawer = SelectedDrawer.Personal
+            })
 
             NavigationDrawerItem(label = {
                 Row(
@@ -190,7 +201,8 @@ private fun DrawerContent(drawerState: DrawerState) {
                 scope.launch {
                     drawerState.close()
                 }
-                selectedDrawer = SelectedDrawer.CreateNewLabel })
+                selectedDrawer = SelectedDrawer.CreateNewLabel
+            })
 
             HorizontalDivider()
             Box(modifier = Modifier.height(24.dp))
@@ -207,24 +219,34 @@ private fun DrawerContent(drawerState: DrawerState) {
                 scope.launch {
                     drawerState.close()
                 }
-                selectedDrawer = SelectedDrawer.Archive })
+                selectedDrawer = SelectedDrawer.Archive
+            })
 
+
+            NavigationDrawerItem(
+                label = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_outlied_trash_24),
+                            contentDescription = "Trash"
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(text = "Trash")
+                    }
+                },
+                selected = selectedDrawer == SelectedDrawer.Trash,
+                onClick = { selectedDrawer = SelectedDrawer.Trash })
 
             NavigationDrawerItem(label = {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(painter = painterResource(id = R.drawable.ic_outlied_trash_24), contentDescription = "Trash")
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Text(text = "Trash")
-                }
-            }, selected = selectedDrawer == SelectedDrawer.Trash, onClick = { selectedDrawer = SelectedDrawer.Trash })
-
-            NavigationDrawerItem(label = {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(painter = painterResource(id = R.drawable.outline_settings_24), contentDescription = "Trash")
+                    Icon(
+                        painter = painterResource(id = R.drawable.outline_settings_24),
+                        contentDescription = "Trash"
+                    )
                     Spacer(modifier = Modifier.width(16.dp))
                     Text(text = "Settings")
                 }
@@ -232,14 +254,18 @@ private fun DrawerContent(drawerState: DrawerState) {
                 scope.launch {
                     drawerState.close()
                 }
-                selectedDrawer = SelectedDrawer.Settings })
+                selectedDrawer = SelectedDrawer.Settings
+            })
 
 
             NavigationDrawerItem(label = {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(painter = painterResource(id = R.drawable.outline_help_outline_24), contentDescription = "Trash")
+                    Icon(
+                        painter = painterResource(id = R.drawable.outline_help_outline_24),
+                        contentDescription = "Trash"
+                    )
                     Spacer(modifier = Modifier.width(16.dp))
                     Text(text = "Help And Feedback")
                 }
@@ -250,7 +276,6 @@ private fun DrawerContent(drawerState: DrawerState) {
                 selectedDrawer = SelectedDrawer.HelpAndFeedback
 
             })
-
 
 
         }
