@@ -53,6 +53,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.itsniaz.nimble.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -62,37 +66,30 @@ import kotlinx.coroutines.launch
 fun HomeScreen() {
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
+    val navController = rememberNavController()
 
     ModalNavigationDrawer(
         drawerState = drawerState,
-        drawerContent = { DrawerContent(drawerState) },
+        drawerContent = { DrawerContent(drawerState,navController) },
         gesturesEnabled = true,
     ) {
-        Scaffold(
-            floatingActionButtonPosition = FabPosition.End,
-            topBar = { TopBar(drawerState, scope) },
-            bottomBar = { BottomBar() }
-        ) { content ->
-            Box(modifier = Modifier.padding(content))
+
+        NavHost(navController, startDestination = "my_notes") {
+            composable("my_notes") { MyNotes(drawerState) }
+            composable("reminders") { Reminders(drawerState) }
+            composable("personal") { PersonalScreen(drawerState) }
+            composable("work") { WorkLabelScreen(drawerState) }
+            composable("create_new_label") { }
+            composable("archive") { }
+            composable("trash") { }
+            composable("settings") { }
+            composable("help_and_feedback") { }
         }
     }
 }
 
-enum class SelectedDrawer {
-    MyNotes,
-    Reminders,
-    Personal,
-    Work,
-    CreateNewLabel,
-    Archive,
-    Trash,
-    Settings,
-    HelpAndFeedback
-}
-
 @Composable
-private fun DrawerContent(drawerState: DrawerState) {
+private fun DrawerContent(drawerState: DrawerState, navController : NavController) {
 
     var selectedDrawer by remember { mutableStateOf(SelectedDrawer.MyNotes) }
     val scope = rememberCoroutineScope()
@@ -118,13 +115,14 @@ private fun DrawerContent(drawerState: DrawerState) {
                 scope.launch {
                     drawerState.close()
                 }
+                navController.navigate("my_notes")
             })
 
             NavigationDrawerItem(label = {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(painter = painterResource(id = R.drawable.ic_lightbulb_24), "Account Icon")
+                    Icon(painter = painterResource(id = R.drawable.ic_reminder_24), "Account Icon")
                     Spacer(modifier = Modifier.width(16.dp))
                     Text(text = "Reminders")
                 }
@@ -133,6 +131,7 @@ private fun DrawerContent(drawerState: DrawerState) {
                 scope.launch {
                     drawerState.close()
                 }
+                navController.navigate("reminders")
 
             })
             Spacer(modifier = Modifier.height(16.dp))
@@ -171,6 +170,8 @@ private fun DrawerContent(drawerState: DrawerState) {
                     drawerState.close()
                 }
                 selectedDrawer = SelectedDrawer.Personal
+                navController.navigate("personal")
+
             })
 
             NavigationDrawerItem(label = {
@@ -186,8 +187,8 @@ private fun DrawerContent(drawerState: DrawerState) {
                 scope.launch {
                     drawerState.close()
                 }
+                navController.navigate("work")
             })
-
 
             NavigationDrawerItem(label = {
                 Row(
@@ -202,6 +203,8 @@ private fun DrawerContent(drawerState: DrawerState) {
                     drawerState.close()
                 }
                 selectedDrawer = SelectedDrawer.CreateNewLabel
+                navController.navigate("work")
+
             })
 
             HorizontalDivider()
@@ -220,6 +223,7 @@ private fun DrawerContent(drawerState: DrawerState) {
                     drawerState.close()
                 }
                 selectedDrawer = SelectedDrawer.Archive
+                navController.navigate("archive")
             })
 
 
@@ -237,7 +241,10 @@ private fun DrawerContent(drawerState: DrawerState) {
                     }
                 },
                 selected = selectedDrawer == SelectedDrawer.Trash,
-                onClick = { selectedDrawer = SelectedDrawer.Trash })
+                onClick = {
+                    selectedDrawer = SelectedDrawer.Trash
+                    navController.navigate("archive")
+                })
 
             NavigationDrawerItem(label = {
                 Row(
@@ -255,6 +262,7 @@ private fun DrawerContent(drawerState: DrawerState) {
                     drawerState.close()
                 }
                 selectedDrawer = SelectedDrawer.Settings
+                navController.navigate("archive")
             })
 
 
@@ -274,106 +282,8 @@ private fun DrawerContent(drawerState: DrawerState) {
                     drawerState.close()
                 }
                 selectedDrawer = SelectedDrawer.HelpAndFeedback
-
+                navController.navigate("archive")
             })
-
-
         }
     }
 }
-
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun TopBar(drawerState: DrawerState, scope: CoroutineScope) {
-    SearchBar(
-        query = "",
-        placeholder = { Text(text = "Search your notes here") },
-        leadingIcon = {
-            IconButton(onClick = {
-                scope.launch {
-                    if (drawerState.isOpen) {
-                        drawerState.close()
-                    } else {
-                        drawerState.open()
-                    }
-                }
-            }) {
-                Icon(Icons.Outlined.Menu, "Menu Icon")
-            }
-        },
-        trailingIcon = { TopBarTrailingIcons() },
-        onQueryChange = {},
-        onSearch = {},
-        active = false,
-        onActiveChange = {},
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-    ) {}
-}
-
-@Composable
-private fun TopBarTrailingIcons() {
-    Row(Modifier.padding(16.dp)) {
-        Icon(Icons.Outlined.MailOutline, contentDescription = "Mail Icon")
-        Spacer(modifier = Modifier.width(16.dp))
-        Image(
-            painter = painterResource(R.drawable.avatar),
-            contentDescription = "avatar",
-            contentScale = ContentScale.Crop,            // crop the image if it's not a square
-            modifier = Modifier
-                .size(24.dp)
-                .clip(CircleShape)                       // clip to the circle shape
-                .border(1.5.dp, Color.Gray, CircleShape)   // add a border (optional)
-        )
-    }
-}
-
-
-@Composable
-private fun BottomBar() {
-    BottomAppBar(
-        actions = {
-            BottomBarActions()
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {},
-                containerColor = BottomAppBarDefaults.containerColor,
-                elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
-            ) {
-                Icon(Icons.Outlined.Add, "Create New Note")
-            }
-        }
-    )
-}
-
-@Composable
-private fun BottomBarActions() {
-    IconButton(onClick = { /* do something */ }) {
-        Icon(
-            painter = painterResource(id = R.drawable.ic_checkbox),
-            contentDescription = "Create Checklist"
-        )
-    }
-    IconButton(onClick = { /* do something */ }) {
-        Icon(
-            painter = painterResource(id = R.drawable.ic_outline_brush_24),
-            contentDescription = "Create Canvas"
-        )
-    }
-    IconButton(onClick = { /* do something */ }) {
-        Icon(
-            painter = painterResource(id = R.drawable.ic_baseline_mic_none_24),
-            contentDescription = "Create Voice Memo"
-        )
-    }
-    IconButton(onClick = { /* do something */ }) {
-        Icon(
-            painter = painterResource(id = R.drawable.ic_outline_image_24),
-            contentDescription = "Add Image"
-        )
-    }
-}
-
