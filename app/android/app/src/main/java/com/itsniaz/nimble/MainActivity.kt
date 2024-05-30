@@ -1,6 +1,6 @@
 package com.itsniaz.nimble
 
-import com.itsniaz.nimble.ui.screens.HomeScreen
+import com.itsniaz.nimble.ui.screens.NimbleApp
 import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -30,7 +30,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                   HomeScreen()
+                   NimbleApp(onExitPressed = {
+                       finish()
+                   })
                 }
             }
         }

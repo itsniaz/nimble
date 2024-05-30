@@ -1,5 +1,9 @@
 package com.itsniaz.nimble.ui.screens
 
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -38,6 +42,7 @@ import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,42 +53,79 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat.finishAffinity
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.itsniaz.nimble.R
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@Preview
-@Composable
-fun HomeScreen() {
 
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+@Composable
+fun NimbleApp(onExitPressed: () -> Unit) {
     val navController = rememberNavController()
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    var currentScreen by remember { mutableStateOf("my_notes") }
+    val context = LocalContext.current
+    var doublePressToExit = false
 
     ModalNavigationDrawer(
         drawerState = drawerState,
-        drawerContent = { DrawerContent(drawerState,navController) },
+        drawerContent = { DrawerContent(drawerState, navController) },
         gesturesEnabled = true,
     ) {
-
         NavHost(navController, startDestination = "my_notes") {
-            composable("my_notes") { MyNotes(drawerState) }
-            composable("reminders") { Reminders(drawerState) }
-            composable("personal") { PersonalScreen(drawerState) }
-            composable("work") { WorkLabelScreen(drawerState) }
+            composable("my_notes") {
+                MyNotes(drawerState)
+                currentScreen = "my_notes"
+            }
+            composable("reminders") {
+                Reminders(drawerState)
+                currentScreen = "reminders"
+            }
+            composable("personal") {
+                PersonalScreen(drawerState)
+                currentScreen = "personal"
+            }
+            composable("work") {
+                WorkLabelScreen(drawerState)
+                currentScreen = "work"
+            }
             composable("create_new_label") { }
             composable("archive") { }
             composable("trash") { }
             composable("settings") { }
             composable("help_and_feedback") { }
+        }
+    }
+
+
+    BackHandler {
+        if (currentScreen != "my_notes") {
+            navController.navigate("my_notes") {
+                popUpTo(navController.graph.startDestinationId) { inclusive = true }
+            }
+            currentScreen = "my_notes"
+        } else {
+            if(doublePressToExit){
+                onExitPressed.invoke()
+            }else{
+                doublePressToExit = true
+                CoroutineScope(kotlinx.coroutines.Dispatchers.Main).launch {
+                    delay(2000)
+                    doublePressToExit = false
+                }
+                Toast.makeText(context, "Press back again to exit", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }
